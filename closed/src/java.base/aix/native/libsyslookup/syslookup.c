@@ -30,8 +30,14 @@
 /* The function list inlines the libc functions which
  * are missing in loading the default library.
  */
-__attribute__((visibility("default"))) void* funcs[] = {
-		&bcopy, &endfsent, &getfsent, &getfsfile, &getfsspec, &longjmp,
-		&memcpy, &memmove, &setfsent, &setjmp, &siglongjmp, &strcat,
-		&strcpy, &strncat, &strncpy
+static void *funcs[] = {
+    &bcopy, &endfsent, &getfsent, &getfsfile, &getfsspec, &longjmp,
+    &memcpy, &memmove, &setfsent, &setjmp, &siglongjmp, &strcat,
+    &strcpy, &strncat, &strncpy
 };
+
+__attribute__((visibility("default"))) void **
+funcs_addr(void)
+{
+    return funcs;
+}
