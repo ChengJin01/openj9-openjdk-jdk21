@@ -42,7 +42,6 @@ import java.util.function.Function;
 import jdk.internal.loader.NativeLibraries;
 import jdk.internal.loader.NativeLibrary;
 import jdk.internal.loader.RawNativeLibraries;
-import jdk.internal.util.OperatingSystem;
 import sun.security.action.GetPropertyAction;
 
 import static java.lang.foreign.ValueLayout.ADDRESS;
@@ -72,7 +71,7 @@ public final class SystemLookup implements SymbolLookup {
         try {
             if (Utils.IS_WINDOWS) {
                 return makeWindowsLookup();
-            } else if (OperatingSystem.isAix() || OperatingSystem.isZOS()) {
+            } else if (Utils.IS_AIX || Utils.IS_ZOS) {
                 return makeDefaultLookup();
             } else {
                 return libLookup(libs -> libs.load(jdkLibraryPath("syslookup")));
@@ -89,9 +88,9 @@ public final class SystemLookup implements SymbolLookup {
     private static MemorySegment getInlinedFunctListAddr() {
         SequenceLayout funcsLayout;
 
-        if (OperatingSystem.isAix()) {
+        if (Utils.IS_AIX) {
             funcsLayout = AixFuncSymbols.LAYOUT;
-        } else if (OperatingSystem.isZOS()) {
+        } else if (Utils.IS_ZOS) {
             funcsLayout = ZosFuncSymbols.LAYOUT;
         } else {
             return null;
@@ -124,7 +123,7 @@ public final class SystemLookup implements SymbolLookup {
         return name -> {
             Objects.requireNonNull(name);
             MemorySegment funcAddr;
-            var symbol = OperatingSystem.isAix() ? AixFuncSymbols.valueOfOrNull(name) : ZosFuncSymbols.valueOfOrNull(name);
+            var symbol = Utils.IS_AIX ? AixFuncSymbols.valueOfOrNull(name) : ZosFuncSymbols.valueOfOrNull(name);
             if (symbol == null) {
                 try {
                     /* Look up the libc functions in the default library. */
